@@ -1,0 +1,9 @@
+.vs/
+.vscode/
+/output/*
+/build/
+/dist/
+*.spec
+~*/
+*.~*
+~*.*
