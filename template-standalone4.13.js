@@ -1,10 +1,10 @@
+/*! art-template-standalone4.13 | https://github.com/aui/art-template */
 'use strict';
 var global = typeof global == 'object' ? global : {},
-    module = typeof module == 'object' ? module : {};
-!function (global, module) {
+    template = null;
+!function (global) {
 
-    // part -1. from runtime.js
-    /*! art-template@runtime | https://github.com/aui/art-template */
+    // part 1. from runtime.js
     var globalThis = typeof self !== 'undefined' ? self : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : {};
     var runtime = Object.create(globalThis);
     var ESCAPE_REG = /["&'<>]/;
@@ -103,7 +103,7 @@ var global = typeof global == 'object' ? global : {},
     //global.$escape = $escape;
     //global.$each = runtime.$each;
 
-    // part 0.1 from adapter\rule.native.js
+    // part 2 from adapter\rule.native.js
     /**
      * 原生模板语法规则
      */
@@ -134,7 +134,7 @@ var global = typeof global == 'object' ? global : {},
             };
         }
     };
-    // part 0.2 from adapter/rule.art.js
+    // part 3 from adapter/rule.art.js
     /**
      * 简洁模板语法规则
      */
@@ -319,7 +319,7 @@ var global = typeof global == 'object' ? global : {},
         }
     };
 
-    // part 0.3 from adapter/extend.js
+    // part 4 from adapter/extend.js
     var toString = Object.prototype.toString;
     var toType = function toType(value) {
         // Null: 兼容 IE8
@@ -356,7 +356,7 @@ var global = typeof global == 'object' ? global : {},
     //module.exports = extend;
     global.extend = extend;
 
-    // part 0.9. from defaults.js
+    // part 5. from defaults.js
     var detectNode = typeof window === 'undefined';
 
     /** 模板编译器默认配置 */
@@ -427,7 +427,7 @@ var global = typeof global == 'object' ? global : {},
     Defaults.prototype = settings;
     var defaults = global.defaults = new Defaults();
 
-    //part 1. from is-keyword/index.js
+    //part 6. from is-keyword/index.js
     var reservedKeywords = {
         'abstract': true,
         'await': true,
@@ -496,7 +496,7 @@ var global = typeof global == 'object' ? global : {},
         return reservedKeywords.hasOwnProperty(str);
     };
     //global.isKeyword = isKeyword;
-    //part 2 from js-tokens/index.js
+    //part 7. from js-tokens/index.js
     Object.defineProperty(exports, "__esModule", {
         value: true
     })
@@ -518,7 +518,7 @@ var global = typeof global == 'object' ? global : {},
     global.matchToToken = matchToToken;
     global.jsTokens = jsTokens;
 
-    //part 3. from es-tokenizer.js
+    //part 8. from es-tokenizer.js
     /**
      * 将逻辑表达式解释为 Tokens
      * @param {string} code
@@ -540,7 +540,7 @@ var global = typeof global == 'object' ? global : {},
 
     global.esTokenizer = esTokenizer;
 
-    //part 4. from tpl-tokenizer.js
+    //part 9. from tpl-tokenizer.js
     var TYPE_STRING = 'string';
     var TYPE_EXPRESSION = 'expression';
     var TYPE_RAW = 'raw';
@@ -640,7 +640,7 @@ var global = typeof global == 'object' ? global : {},
     global.tplTokenizer = tplTokenizer;
 
 
-    //part 4. from compiler.js
+    //part 10. from compiler.js
     var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
     function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -1110,7 +1110,7 @@ var global = typeof global == 'object' ? global : {},
     //module.exports.Compiler = Compiler;
     global.Compiler = Compiler;
 
-    //part 5. from error.js
+    //part 11. from error.js
     function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
     function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -1171,7 +1171,7 @@ var global = typeof global == 'object' ? global : {},
     //module.exports.TemplateError = TemplateError;
     global.TemplateError = TemplateError;
 
-    // part 6. from compile/index.js
+    // part 12. from compile/index.js
     /**
      * 编译模版
      * @param {string|Object} source   模板内容
@@ -1293,7 +1293,7 @@ var global = typeof global == 'object' ? global : {},
     //module.exports = compile;
     global.compile = compile;
 
-    //part 7. render.js
+    //part 13. render.js
     /**
      * 渲染模板
      * @param   {string|Object}     source  模板内容
@@ -1305,14 +1305,14 @@ var global = typeof global == 'object' ? global : {},
         return compile(source, options)(data);
     };
 
-    //part 7. template.js
+    //part 14. template.js
     /**
      * 模板引擎
      * @param   {string}            filename 模板名
      * @param   {Object|string}     content  数据或模板内容
      * @return  {string|function}            如果 content 为 string 则编译并缓存模板，否则渲染模板
      */
-    var template = function template(filename, content) {
+    template = function template(filename, content) {
         return content instanceof Object ? render({
             filename: filename
         }, content) : compile({
@@ -1327,4 +1327,4 @@ var global = typeof global == 'object' ? global : {},
 
     global.template = template;
 
-}(global, module);
+}(global);
