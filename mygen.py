@@ -1,11 +1,11 @@
 import mysql.connector, time, re, os, sys, execjs, json
+from JSONEncoder import JSONEncoder
 
 debug = True
-debugArgs = "mygen.py◼127.0.0.1:3306|qinhy|123456|db_entbase|tb_workflow◼./templates/entity.kt◼./output/workflow.kt◼author=qinhuayi|datestr=2020-05-07".split('◼')
+debugArgs = "mygen.py◼127.0.0.1:3306|vault-keeper|123456|db_vault|tb_user◼./templates/entity.kt◼./output/user.kt◼author=qinhuayi|datestr=2020-05-07".split('◼')
 sysargv = debugArgs if debug else sys.argv
 
 def readArguments(args):
-    #args = {dbhost: '', dbport: 0, dbuser: '', dbpassword: '', dbname: '', tableName: '', SQL: '', template: '', outputfile: '', consts: ''}
     if len(sysargv) >= 4:
         connstr = sysargv[1].split('|')
         if len(connstr) == 5:
@@ -51,9 +51,8 @@ def render(jspath, tmpl, data):
         js = fread.read()
     with open(tmpl, 'r', encoding='utf-8') as fread:   
         template = fread.read()
-    jsonData = {'tmpl': template,  'data': data}
-    #js = f"{js}\n var data={{tmpl:'aa', data:{{a:'bcd'}} }};\n function main() {{ return global.template.compile(data.tmpl)(data.data); }} "
-    js = f"{js}\n var data={{tmpl:'aa', data:{{a:'bcd'}} }};\n function main() {{ return global.template.compile('<a>{{{{@a}}}}</a>')({{a:1}}); }} "
+    jsonData = json.dumps({'tmpl': template,  'data': data}, cls=JSONEncoder, indent=4)
+    js = f"{js}\n var data={jsonData};\n function main() {{ return template.compile(data.tmpl)(data.data); }} "
     compiled = execjs.compile(js)
     return compiled.call('main')
 
@@ -73,15 +72,14 @@ def createFieldNameByIndex(row, fields):
     arr = fields.split(',')
     dat = {}
     for i in range(len(arr)):
-        fieldname = arr[i].split(' ')[1] if ' ' in arr[i].strip() else arr[i].strip()
+        fieldname = arr[i].strip().split(' ')[1] if ' ' in arr[i].strip() else arr[i].strip()
         if fieldname != '':
-            dat[i] = row[i]
-            dat[fieldname] = row[i]
+            dat[fieldname] = dat[i] = row[i]
     del row
     return dat
 
 def fetchTableSchemaData(cursor, dbname, tableName):
-    fields = "TABLE_NAME, TABLE_NAME name, TABLE_TYPE, TABLE_COMMENT, TABLE_COMMENT comment"
+    fields = "TABLE_NAME, TABLE_NAME name, TABLE_TYPE, TABLE_TYPE type, TABLE_COMMENT, TABLE_COMMENT comment"
     sql = f"select {fields} from information_schema.tables where table_schema='{dbname}' and table_name = '{tableName}' "
     cursor.execute(sql)
     table = cursor.fetchone()
@@ -106,8 +104,8 @@ def tryFetchData(args):
     dat = {}
     try:
         print(f"connstr={args['dbhost']}:{args['dbport']}|{args['dbuser']}|{args['dbpassword']}|{args['dbname']}")
-        conn = mysql.connector.connect(host=args['dbhost'], port=args['dbport'], user=args['dbuser'], passwd=args['dbpassword'], db=args['dbname'], charset='utf8')
-        cur = conn.cursor()
+        conn = mysql.connector.connect(host=args['dbhost'], port=args['dbport'], user=args['dbuser'], passwd=args['dbpassword'], db=args['dbname'], charset='utf8mb4')
+        cur = conn.cursor(buffered=True)
         dat = fetchTableSchemaData(cur, args['dbname'], args['tableName']) if args['SQL'] =='' else fetchQueryData(cur, args['SQL'])
         dat['consts'] = readConsts(args['consts'])
         cur.close()
