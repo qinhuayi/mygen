@@ -11,15 +11,11 @@
 			TABLE_NAME: '', 
 			name: '', 
 			TABLE_TYPE: '', 
+			type: '',
 			TABLE_COMMENT: '', 
-			comment: '', 
-			Code: '', 
-			code: ''
+			comment: ''
 		},
 		columns: [{
-			Code: '',
-			code: '',
-			javatype: '',
 			ID: '',
 			ORDINAL_POSITION: '',
 			COLUMN_NAME: '',
@@ -31,7 +27,8 @@
 			CHARACTER_MAXIMUM_LENGTH: '',
 			NUMERIC_PRECISION: '',
 			NUMERIC_SCALE: '',
-			EXTRA: ''
+			EXTRA: '',
+			javatype: ''
 		}]
 		rows: []
 		consts: {}
