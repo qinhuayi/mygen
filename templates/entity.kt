@@ -1,7 +1,7 @@
-﻿package com.upreal.webserver.entity
+﻿package com.kezhida.webserver.entity
 
 /**
- * @author qinhuayi
- * @since 2020/12/17
+ * @author {{@author}} 
+ * @email {{@email}}
  */
-data class {{a}} ()
+data class {{@table.name}} ()
