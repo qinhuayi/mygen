@@ -53,7 +53,7 @@ def render(jspath, tmpl, data):
         template = fread.read()
     jsonData = {'tmpl': template,  'data': data}
     #js = f"{js}\n var data={{tmpl:'aa', data:{{a:'bcd'}} }};\n function main() {{ return global.template.compile(data.tmpl)(data.data); }} "
-    js = f"var window = {{}}, module = {{}}, exports = {{}};\n {js}\n var data={{tmpl:'aa', data:{{a:'bcd'}} }};\n function main() {{ return window.template.compile(data.tmpl)(data.data); }} "
+    js = f"{js}\n var data={{tmpl:'aa', data:{{a:'bcd'}} }};\n function main() {{ return global.template.compile('<a>{{{{@a}}}}</a>')({{a:1}}); }} "
     compiled = execjs.compile(js)
     return compiled.call('main')
 
@@ -122,8 +122,9 @@ try:
     if not os.path.exists(os.path.dirname(args['outputfile'])):
         os.makedirs(os.path.dirname(args['outputfile']))
     data = tryFetchData(args)
-    codes = render(os.path.abspath("art-template-x.js"), os.path.abspath(args['template']), data)
-    output(os.path.abspath(args['outputfile']), codes, 'utf-8')
+    codes = render(os.path.abspath("template-standalone4.13.js"), os.path.abspath(args['template']), data)
+    print(codes)
+    #output(os.path.abspath(args['outputfile']), codes, 'utf-8')
     times = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     print(' Done! %s ' %times)
 except Exception as ex:
