@@ -148,12 +148,12 @@ var global = typeof global == 'object' ? global : {},
 
             //
             var warn = function warn(oldSyntax, newSyntax) {
-                console.warn((options.filename || 'anonymous') + ':' + (match.line + 1) + ':' + (match.start + 1) + '\n' + ('Template upgrade: {{' + oldSyntax + '}} -> {{' + newSyntax + '}}'));
+                console.info((options.filename || 'anonymous') + ':' + (match.line + 1) + ':' + (match.start + 1) + '\n' + ('Template upgrade: {{' + oldSyntax + '}} -> {{' + newSyntax + '}}'));
             };
 
             // v3 compat: #value
             if (raw === '#') {
-                warn('#value', '@value');
+                //warn('#value', '@value');
             }
 
             switch (key) {
@@ -188,7 +188,7 @@ var global = typeof global == 'object' ? global : {},
 
                     if (group[1] === 'as') {
                         // ... v3 compat ...
-                        warn('each object as value index', 'each object value index');
+                        //warn('each object as value index', 'each object value index');
                         group.splice(1, 1);
                     }
 
@@ -216,7 +216,7 @@ var global = typeof global == 'object' ? global : {},
 
                 case 'echo':
                     key = 'print';
-                    warn('echo value', 'value');
+                    //warn('echo value', 'value');
                 case 'print':
                 case 'include':
                 case 'extend':
