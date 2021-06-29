@@ -1,8 +1,8 @@
 import mysql.connector, os, sys, re
 from js2py import evaljs
 
-debug = True
-debugArgs = "mygen.py◼127.0.0.1:3306|vault-keeper|123456|db_vault|tb_user◼./templates/entity.kt◼./output/user.kt◼author=qinhuayi|email=qinhuayi@qq.com".split('◼')
+debug = False
+debugArgs = "mygen.py◼127.0.0.1:3306|vault-keeper|123456|db_vault|tb_user◼./templates/entity.java◼./output/user.java◼author=qinhuayi|email=qinhuayi@qq.com".split('◼')
 sysargv = debugArgs if debug else sys.argv
 
 def readArguments(args):
