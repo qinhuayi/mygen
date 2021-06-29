@@ -1,5 +1,5 @@
-import mysql.connector, time, re, os, sys, execjs, json
-from JSONEncoder import JSONEncoder
+import mysql.connector, os, sys, re
+from js2py import evaljs
 
 debug = True
 debugArgs = "mygen.py◼127.0.0.1:3306|vault-keeper|123456|db_vault|tb_user◼./templates/entity.kt◼./output/user.kt◼author=qinhuayi|datestr=2020-05-07".split('◼')
@@ -44,17 +44,13 @@ def readConsts(str):
             consts[sname] = svalue.strip()
     return consts
 
-def render(jspath, tmpl, data):
-    template = ""
-    js = ""
+def render(jspath, tplpath, data):
     with open(jspath, 'r', encoding='utf-8') as fread:   
         js = fread.read()
-    with open(tmpl, 'r', encoding='utf-8') as fread:   
+    with open(tplpath, 'r', encoding='utf-8') as fread:   
         template = fread.read()
-    jsonData = json.dumps({'tmpl': template,  'data': data}, cls=JSONEncoder, indent=4)
-    js = f"{js}\n var data={jsonData};\n function main() {{ return template.compile(data.tmpl)(data.data); }} "
-    compiled = execjs.compile(js)
-    return compiled.call('main')
+    compile = evaljs.eval_js(js)
+    return compile(template, data)
 
 def output(filename, codes, encoding):
     with open(args['outputfile'],'w+', encoding=encoding) as fout:   
@@ -74,7 +70,7 @@ def createFieldNameByIndex(row, fields):
     for i in range(len(arr)):
         fieldname = arr[i].strip().split(' ')[1] if ' ' in arr[i].strip() else arr[i].strip()
         if fieldname != '':
-            dat[fieldname] = dat[i] = row[i]
+            dat[fieldname] = dat[i] = str(row[i], encoding='utf-8') if isinstance(row[i], bytes) else row[i]
     del row
     return dat
 
@@ -89,11 +85,12 @@ def fetchTableSchemaData(cursor, dbname, tableName):
     fields = "ORDINAL_POSITION ID, ORDINAL_POSITION, COLUMN_NAME, COLUMN_KEY, DATA_TYPE, COLUMN_TYPE, COLUMN_COMMENT, IS_NULLABLE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE, EXTRA"
     sql = f"select {fields} from information_schema.columns where table_schema='{dbname}' and table_name='{tableName}' ORDER BY ordinal_position "
     cursor.execute(sql)
-    columns = cursor.fetchall()
-    for col in columns:
+    columns = [] 
+    for col in cursor.fetchall():
         col = createFieldNameByIndex(col, fields)
         col['javatype'] = dbtype2javatype(col['DATA_TYPE'])
-    return {'table': table, 'columns': columns, 'rows': columns};
+        columns.append(col)
+    return {'table': table, 'columns': columns};
 
 def fetchQueryData(cursor, sql):
     cursor.execute(sql)
@@ -121,9 +118,9 @@ try:
         os.makedirs(os.path.dirname(args['outputfile']))
     data = tryFetchData(args)
     codes = render(os.path.abspath("template-standalone4.13.js"), os.path.abspath(args['template']), data)
-    print(codes)
-    #output(os.path.abspath(args['outputfile']), codes, 'utf-8')
-    times = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    print(' Done! %s ' %times)
+    output(os.path.abspath(args['outputfile']), codes, 'utf-8')
+    if debug:
+        print(codes)
+    print(' Done!')
 except Exception as ex:
     printErr(ex)
