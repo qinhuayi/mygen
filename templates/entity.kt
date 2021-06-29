@@ -7,7 +7,7 @@
  * @email {{@consts.email}}
  * {{@table.comment}}
  */ 
-data class {{@pascal(table.name)}} (
+public data class {{@pascal(table.name)}} (
 	{{each columns as col i}}var {{@camal(col.COLUMN_NAME)}}: {{@col.javatype}}{{if i < columns.length - 1}},{{/if}} //{{@col.COLUMN_COMMENT}}
 	{{/each}}
 )
