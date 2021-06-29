@@ -1,6 +1,7 @@
 /*! art-template-standalone4.13 | https://github.com/aui/art-template */
 'use strict';
 var global = typeof global == 'object' ? global : {},
+    exports = typeof exports == 'object' ? exports : {},
     template = null;
 !function (global) {
 
@@ -10,7 +11,6 @@ var global = typeof global == 'object' ? global : {},
     var ESCAPE_REG = /["&'<>]/;
 
     /**
-     * 编码模板输出的内容
      * @param  {any}        content
      * @return {string}
      */
@@ -19,7 +19,6 @@ var global = typeof global == 'object' ? global : {},
     };
 
     /**
-     * 迭代器，支持数组与对象
      * @param {array|Object} data
      * @param {function}     callback
      */
@@ -35,7 +34,6 @@ var global = typeof global == 'object' ? global : {},
         }
     };
 
-    // 将目标转成字符
     function toString(value) {
         if (typeof value !== 'string') {
             if (value === undefined || value === null) {
@@ -50,7 +48,6 @@ var global = typeof global == 'object' ? global : {},
         return value;
     }
 
-    // 编码 HTML 内容
     function xmlEscape(content) {
         var html = '' + content;
         var regexResult = ESCAPE_REG.exec(html);
@@ -104,9 +101,7 @@ var global = typeof global == 'object' ? global : {},
     //global.$each = runtime.$each;
 
     // part 2 from adapter\rule.native.js
-    /**
-     * 原生模板语法规则
-     */
+
     var nativeRule = {
         test: /<%(#?)((?:==|=#|[=-])?)[ \t]*([\w\W]*?)[ \t]*(-?)%>/,
         use: function use(match, comment, output, code /*, trimMode*/) {
@@ -135,9 +130,7 @@ var global = typeof global == 'object' ? global : {},
         }
     };
     // part 3 from adapter/rule.art.js
-    /**
-     * 简洁模板语法规则
-     */
+
     var artRule = {
         test: /{{([@#]?)[ \t]*(\/?)([\w\W]*?)[ \t]*}}/,
         use: function use(match, raw, close, code) {
@@ -153,7 +146,7 @@ var global = typeof global == 'object' ? global : {},
             var output = raw ? 'raw' : false;
             var key = close + values.shift();
 
-            // 旧版语法升级提示
+            //
             var warn = function warn(oldSyntax, newSyntax) {
                 console.warn((options.filename || 'anonymous') + ':' + (match.line + 1) + ':' + (match.start + 1) + '\n' + ('Template upgrade: {{' + oldSyntax + '}} -> {{' + newSyntax + '}}'));
             };
@@ -228,7 +221,7 @@ var global = typeof global == 'object' ? global : {},
                 case 'include':
                 case 'extend':
                     if (values.join('').trim().indexOf('(') !== 0) {
-                        // 执行函数省略 `()` 与 `,`
+                        // 
                         group = artRule._split(esTokens);
                         group.shift();
                         code = key + '(' + group.join(',') + ')';
@@ -239,7 +232,7 @@ var global = typeof global == 'object' ? global : {},
                     if (~values.indexOf('|')) {
                         var v3split = ':'; // ... v3 compat ...
 
-                        // 将过滤器解析成二维数组
+                        // 
                         var _group = esTokens.reduce(function (group, token) {
                             var value = token.value,
                                 type = token.type;
@@ -261,7 +254,7 @@ var global = typeof global == 'object' ? global : {},
                             return artRule._split(g);
                         });
 
-                        // 将过滤器管道化
+                        // 
                         code = _group.reduce(function (accumulator, filter) {
                             var name = filter.shift();
                             filter.unshift(accumulator);
@@ -281,9 +274,6 @@ var global = typeof global == 'object' ? global : {},
             return result;
         },
 
-        // 将多个 javascript 表达式拆分成组
-        // 支持基本运算、三元表达式、取值、运行函数，不支持 `typeof value` 操作
-        // 只支持 string、number、boolean、null、undefined 这几种类型声明，不支持 function、object、array
         _split: function _split(esTokens) {
             esTokens = esTokens.filter(function (_ref) {
                 var type = _ref.type;
@@ -322,12 +312,11 @@ var global = typeof global == 'object' ? global : {},
     // part 4 from adapter/extend.js
     var toString = Object.prototype.toString;
     var toType = function toType(value) {
-        // Null: 兼容 IE8
+        // 
         return value === null ? 'Null' : toString.call(value).slice(8, -1);
     };
 
     /**
-     * 快速继承默认配置
      * @param   {Object}    options
      * @param   {?Object}   defaults
      * @return  {Object}
@@ -359,62 +348,38 @@ var global = typeof global == 'object' ? global : {},
     // part 5. from defaults.js
     var detectNode = typeof window === 'undefined';
 
-    /** 模板编译器默认配置 */
     var settings = {
-        // 模板内容。如果没有此字段，则会根据 filename 来加载模板内容
         source: null,
-        // 模板名
         filename: null,
-        // 模板语法规则列表
         //rules: [nativeRule, artRule],
         rules: [artRule, artRule],
-        // 是否开启对模板输出语句自动编码功能。为 false 则关闭编码输出功能
-        // escape 可以防范 XSS 攻击
         escape: true,
-        // 启动模板引擎调试模式。如果为 true: {cache:false, minimize:false, compileDebug:true}
         debug: detectNode ? process.env.NODE_ENV !== 'production' : false,
-        // bail 如果为 true，编译错误与运行时错误都会抛出异常
         bail: true,
-        // 是否开启缓存
         cache: true,
-        // 是否开启压缩。它会运行 htmlMinifier，将页面 HTML、CSS、CSS 进行压缩输出
-        // 如果模板包含没有闭合的 HTML 标签，请不要打开 minimize，否则可能被 htmlMinifier 修复或过滤
         minimize: true,
-        // 是否编译调试版
         compileDebug: false,
-        // 模板路径转换器
         //resolveFilename: resolveFilename,
         resolveFilename: null,
-        // 子模板编译适配器
         //include: include,
         include: null,
-        // HTML 压缩器。仅在 NodeJS 环境下有效
         //htmlMinifier: htmlMinifier,
         htmlMinifier: null,
-        // HTML 压缩器配置。参见 https://github.com/kangax/html-minifier
         htmlMinifierOptions: {
             collapseWhitespace: true,
             minifyCSS: true,
             minifyJS: true,
-            // 运行时自动合并：rules.map(rule => rule.test)
             ignoreCustomFragments: []
         },
-        // 错误事件。仅在 bail 为 false 时生效
         //onerror: onerror,
         onerror: null,
-        // 模板文件加载器
         //loader: loader,
         loader: null,
-        // 缓存中心适配器（依赖 filename 字段）
         //caches: caches,
         caches: null,
-        // 模板根目录。如果 filename 字段不是本地路径，则在 root 查找模板
         root: '/',
-        // 默认后缀名。如果没有后缀名，则会自动添加 extname
         extname: '.art',
-        // 忽略的变量。被模板编译器忽略的模板变量列表
         ignore: [],
-        // 导入的模板变量
         imports: runtime
     };
 
@@ -520,7 +485,6 @@ var global = typeof global == 'object' ? global : {},
 
     //part 8. from es-tokenizer.js
     /**
-     * 将逻辑表达式解释为 Tokens
      * @param {string} code
      * @return {Object[]}
      */
@@ -575,7 +539,6 @@ var global = typeof global == 'object' ? global : {},
     }
 
     /**
-     * 将模板转换为 Tokens
      * @param {string}      source
      * @param {Object[]}    rules     @see defaults.rules
      * @param {Object}      context
@@ -649,10 +612,8 @@ var global = typeof global == 'object' ? global : {},
 
     function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-    /** 传递给模板的数据引用 */
     var DATA = '$data';
 
-    /** 外部导入的所有全局变量引用 */
     var IMPORTS = '$imports';
 
     /**  $imports.$escape */
@@ -661,34 +622,24 @@ var global = typeof global == 'object' ? global : {},
     /**  $imports.$each */
     var EACH = '$each';
 
-    /** 文本输出函数 */
     var PRINT = 'print';
 
-    /** 包含子模板函数 */
     var INCLUDE = 'include';
 
-    /** 继承布局模板函数 */
     var EXTEND = 'extend';
 
-    /** “模板块”读写函数 */
     var BLOCK = 'block';
 
-    /** 字符串拼接变量 */
     var OUT = '$$out';
 
-    /** 运行时逐行调试记录变量 [line, start, source] */
     var LINE = '$$line';
 
-    /** 所有“模板块”变量 */
     var BLOCKS = '$$blocks';
 
-    /** 截取模版输出“流”的函数 */
     var SLICE = '$$slice';
 
-    /** 继承的布局模板的文件地址变量 */
     var FROM = '$$from';
 
-    /** 编译设置变量 */
     var OPTIONS = '$$options';
 
     var has = function has(object, key) {
@@ -698,7 +649,6 @@ var global = typeof global == 'object' ? global : {},
 
     var Compiler = function () {
         /**
-         * 模板编译器
          * @param   {Object}    options
          */
         function Compiler(options) {
@@ -712,28 +662,21 @@ var global = typeof global == 'object' ? global : {},
             var minimize = options.minimize;
             var htmlMinifier = options.htmlMinifier;
 
-            // 编译选项
             this.options = options;
 
-            // 所有语句堆栈
             this.stacks = [];
 
-            // 运行时注入的上下文
             this.context = [];
 
-            // 模板语句编译后的代码
             this.scripts = [];
 
             // context map
             this.CONTEXT_MAP = {};
 
-            // 忽略的变量名单
             this.ignore = [DATA, IMPORTS, OPTIONS].concat(_toConsumableArray(options.ignore));
 
-            // 按需编译到模板渲染函数的内置变量
             this.internal = (_internal = {}, _defineProperty(_internal, OUT, '\'\''), _defineProperty(_internal, LINE, '[0,0]'), _defineProperty(_internal, BLOCKS, 'arguments[1]||{}'), _defineProperty(_internal, FROM, 'null'), _defineProperty(_internal, PRINT, 'function(){var s=\'\'.concat.apply(\'\',arguments);' + OUT + '+=s;return s}'), _defineProperty(_internal, INCLUDE, 'function(src,data){var s=' + OPTIONS + '.include(src,data||' + DATA + ',arguments[2]||' + BLOCKS + ',' + OPTIONS + ');' + OUT + '+=s;return s}'), _defineProperty(_internal, EXTEND, 'function(from){' + FROM + '=from}'), _defineProperty(_internal, SLICE, 'function(c,p,s){p=' + OUT + ';' + OUT + '=\'\';c();s=' + OUT + ';' + OUT + '=p+s;return s}'), _defineProperty(_internal, BLOCK, 'function(){var a=arguments,s;if(typeof a[0]===\'function\'){return ' + SLICE + '(a[0])}else if(' + FROM + '){if(!' + BLOCKS + '[a[0]]){' + BLOCKS + '[a[0]]=' + SLICE + '(a[1])}else{' + OUT + '+=' + BLOCKS + '[a[0]]}}else{s=' + BLOCKS + '[a[0]];if(typeof s===\'string\'){' + OUT + '+=s}else{s=' + SLICE + '(a[1])}return s}}'), _internal);
 
-            // 内置函数依赖关系声明
             this.dependencies = (_dependencies = {}, _defineProperty(_dependencies, PRINT, [OUT]), _defineProperty(_dependencies, INCLUDE, [OUT, OPTIONS, DATA, BLOCKS]), _defineProperty(_dependencies, EXTEND, [FROM, /*[*/INCLUDE /*]*/]), _defineProperty(_dependencies, BLOCK, [SLICE, FROM, OUT, BLOCKS]), _dependencies);
 
             this.importContext(OUT);
@@ -760,7 +703,6 @@ var global = typeof global == 'object' ? global : {},
         }
 
         /**
-         * 将模板代码转换成 tplToken 数组
          * @param   {string} source
          * @return  {Object[]}
          */
@@ -773,7 +715,6 @@ var global = typeof global == 'object' ? global : {},
             }
 
             /**
-             * 将模板表达式转换成 esToken 数组
              * @param   {string} source
              * @return  {Object[]}
              */
@@ -785,7 +726,6 @@ var global = typeof global == 'object' ? global : {},
             }
 
             /**
-             * 获取变量列表
              * @param {Object[]} esTokens
              * @return {string[]}
              */
@@ -810,7 +750,6 @@ var global = typeof global == 'object' ? global : {},
             }
 
             /**
-             * 导入模板上下文
              * @param {string} name
              */
 
@@ -838,10 +777,8 @@ var global = typeof global == 'object' ? global : {},
                             });
                         }
 
-                        // imports 继承了 Global，但是继承的属性不分配到顶级变量中，避免占用了模板内部的变量名称
                     } else if (name == ESCAPE || name == EACH || has(imports, name)) {
                         value = IMPORTS + '.' + name;
-                        //value = DATA + '.' + name;
                     } else {
                         value = DATA + '.' + name;
                     }
@@ -855,7 +792,6 @@ var global = typeof global == 'object' ? global : {},
             }
 
             /**
-             * 解析字符串（HTML）直接输出语句
              * @param {Object} tplToken
              */
 
@@ -877,7 +813,6 @@ var global = typeof global == 'object' ? global : {},
             }
 
             /**
-             * 解析逻辑表达式语句
              * @param {Object} tplToken
              */
 
@@ -913,7 +848,6 @@ var global = typeof global == 'object' ? global : {},
             }
 
             /**
-             * 检查解析后的模板语句是否存在语法错误
              * @param  {string} script
              * @return {boolean}
              */
@@ -921,9 +855,6 @@ var global = typeof global == 'object' ? global : {},
         }, {
             key: 'checkExpression',
             value: function checkExpression(script) {
-                // 没有闭合的块级模板语句规则
-                // 基于正则规则来补全语法不能保证 100% 准确，
-                // 但是在绝大多数情况下足以满足辅助开发调试的需要
                 var rules = [
                     // <% } %>
                     // <% }else{ %>
@@ -959,7 +890,6 @@ var global = typeof global == 'object' ? global : {},
             }
 
             /**
-             * 编译
              * @return  {function}
              */
 
@@ -1086,7 +1016,6 @@ var global = typeof global == 'object' ? global : {},
     }();
 
     /**
-     * 模板内置常量
      */
 
 
@@ -1118,7 +1047,6 @@ var global = typeof global == 'object' ? global : {},
     function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
     /**
-     * 模板错误处理类
      * @param   {Object}    options
      */
     var TemplateError = function (_Error) {
@@ -1173,9 +1101,6 @@ var global = typeof global == 'object' ? global : {},
 
     // part 12. from compile/index.js
     /**
-     * 编译模版
-     * @param {string|Object} source   模板内容
-     * @param {?Object}       options  编译选项
      * @return {function}
      */
     var compile = function compile(source) {
@@ -1187,11 +1112,9 @@ var global = typeof global == 'object' ? global : {},
             options.source = source;
         }
 
-        // 合并默认配置
         options = defaults.$extend(options);
         source = options.source;
 
-        // debug 模式
         /* istanbul ignore if */
         if (options.debug === true) {
             options.cache = false;
@@ -1203,7 +1126,6 @@ var global = typeof global == 'object' ? global : {},
             options.minimize = false;
         }
 
-        // 转换成绝对路径
         if (options.filename) {
             options.filename = options.resolveFilename(options.filename, options);
         }
@@ -1212,7 +1134,6 @@ var global = typeof global == 'object' ? global : {},
         var cache = options.cache;
         var caches = options.caches;
 
-        // 匹配缓存
         if (cache && filename) {
             var _render = caches.get(filename);
             if (_render) {
@@ -1220,7 +1141,6 @@ var global = typeof global == 'object' ? global : {},
             }
         }
 
-        // 加载外部模板
         if (!source) {
             try {
                 source = options.loader(filename, options);
@@ -1259,7 +1179,6 @@ var global = typeof global == 'object' ? global : {},
             try {
                 return fn(data, blocks);
             } catch (error) {
-                // 运行时出错以调试模式重载
                 if (!options.compileDebug) {
                     options.cache = false;
                     options.compileDebug = true;
@@ -1293,26 +1212,17 @@ var global = typeof global == 'object' ? global : {},
     //module.exports = compile;
     global.compile = compile;
 
-    //part 13. render.js
+    //part 13. from render.js
     /**
-     * 渲染模板
-     * @param   {string|Object}     source  模板内容
-     * @param   {Object}            data    数据
-     * @param   {?Object}           options 选项
-     * @return  {string}            渲染好的字符串
      */
     var render = function render(source, data, options) {
         return compile(source, options)(data);
     };
 
-    //part 14. template.js
+    //part 14. from template.js
     /**
-     * 模板引擎
-     * @param   {string}            filename 模板名
-     * @param   {Object|string}     content  数据或模板内容
-     * @return  {string|function}            如果 content 为 string 则编译并缓存模板，否则渲染模板
      */
-    template = function template(filename, content) {
+    var _template = function template(filename, content) {
         return content instanceof Object ? render({
             filename: filename
         }, content) : compile({
@@ -1321,10 +1231,14 @@ var global = typeof global == 'object' ? global : {},
         });
     };
 
-    template.render = render;
-    template.compile = compile;
-    template.defaults = defaults;
+    _template.render = render;
+    _template.compile = compile;
+    _template.defaults = defaults;
 
-    global.template = template;
+    template = _template;
 
 }(global);
+
+exports.compile = function (tmpl, data) {
+    return template.compile(tmpl)(data)
+};
