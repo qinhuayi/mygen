@@ -2,7 +2,7 @@
 	**Mygen**是一个Python编写的支持mysql连接和art-template模板的命令行方式的代码生成器。
 	**Mygen** is a code generator under command line writen by Python which support Mysql connection and Art-Template.
 
-## 程序设计说明 Program Design
+## 程序设计 Program Design
 	1. 首先读取命令行参数，获取Mysql连接字符串、模板文件路径、输出文件路径和模板用到的常量；At first read command line arguments and get Mysql connection string and template file path and output path and consts within template;
 	2. 然后连接Mysql，取出数据；Second, connect to Mysql and fetch data;
 	3. 之后读取art-template-stanalone.js文件并且用js2py解析出exports对象内唯一的compile方法；And then read the js file 'art-template-stanalone.js' and extract one unique method 'compile' inside object 'exports' with the module 'js2py';
@@ -13,8 +13,9 @@
 	pip install mysql-connector
 	pip install js2py
 	```
-
-## 模板数据说明 Template Data 
+## 关于模板 About Template 
+	模板目前仅支持es5。js2py内置有babel方式解析es6的功能但是它仍有不少问题，不稳定。 Template only support es5 by now. The 'js2py' embedded with es6 feature with babel but it is unstable and several problems have been found.
+## 模板数据格式 Template Data Structure
 	模板得到的JSON数据格式如下: The JSON data gotten by template like this:
 	```
 	{ 
@@ -56,5 +57,4 @@
 	`python mygen.py "127.0.0.1:3306|qinhy|123456|db_entbase|tb_workflow" "templates/entity.kt" "output/workflow.kt" "author=qinhuayi|email=qinhuayi@qq.com"`
 	另一个例子（查询模式）：Another Example(Query Mode):
 	`python mygen.py "127.0.0.1:3306|qinhy|123456|db_entbase|select * from tb_workflow" "templates/entity.kt" "output/workflow.kt" "author=qinhuayi|email=qinhuayi@qq.com"`
-	推荐编写shell脚本来运行：Recommand run by shell command scripts:
-	`mygen`
+	推荐编写shell脚本来运行。Recommand run by shell scripts.
