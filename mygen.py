@@ -1,8 +1,9 @@
+#coding=utf-8
 import mysql.connector, os, sys, re
 from js2py import evaljs
 
 debug = False
-debugArgs = "mygen.py◼127.0.0.1:3306|vault-keeper|123456|db_vault|tb_user◼./templates/entity.java◼./output/user.java◼author=qinhuayi|email=qinhuayi@qq.com".split('◼')
+debugArgs = "mygen.py§127.0.0.1:3306|vault-keeper|123456|db_vault|tb_user§./templates/entity.java§./output/user.java§author=qinhuayi|email=qinhuayi@qq.com".split('§')
 sysargv = debugArgs if debug else sys.argv
 
 def readArguments(args):
@@ -18,18 +19,18 @@ def readArguments(args):
             args['tableName'] = connstr[4] if re.match('^\\w+$', connstr[4]) else ''
             args['SQL'] = connstr[4] if args['tableName'] == '' else ''
         else:
-            print('\t ◼mysql参数不正确! 需要竖线分隔的5个参数: "<host:port>|<dbuser>|<pwd>|<dbname>|<tableNameOrSQL>"')
+            print('\t mysql参数不正确! 需要竖线分隔的5个参数: "<host:port>|<dbuser>|<pwd>|<dbname>|<tableNameOrSQL>"')
             sys.exit(0)
 
         args['template'] = os.path.abspath(sysargv[2])
         if not os.path.isfile(args['template']):
-            print(f'\t ◼找不到模板文件' + args['template'])
+            print(f"\t 找不到模板文件${args['template']}")
             sys.exit(0)
 
         args['outputfile'] = sysargv[3]
         args['consts'] = sysargv[4] if len(sysargv) >= 5 else ''
     else:
-        print('\t ◼参数数量不正确!需要3个以上参数:"<host:port>|<dbuser>|<pwd>|<dbname>|<tableNameOrSQL>" "<templatefile>" "<outputfile>" "str0=..|str1=.."')
+        print('\t 参数数量不正确!需要3个以上参数:"<host:port>|<dbuser>|<pwd>|<dbname>|<tableNameOrSQL>" "<templatefile>" "<outputfile>" "str0=..|str1=.."')
         sys.exit(0)
     return args
 
@@ -57,7 +58,7 @@ def output(filename, codes, encoding):
         fout.write(codes)
 
 def printErr(ex):        
-    print(f"◼ Error: \r\n\t file= {ex.__traceback__.tb_frame.f_globals['__file__']}\r\n\t line= {ex.__traceback__.tb_lineno}\r\n\t msg= {repr(ex)} ")
+    print(f"§ Error: \r\n\t file= {ex.__traceback__.tb_frame.f_globals['__file__']}\r\n\t line= {ex.__traceback__.tb_lineno}\r\n\t msg= {repr(ex)} ")
 
 def dbtype2javatype(name):
     dbtypes = "VARCHAR, CHAR, BLOB, TEXT, INTEGER, TINYINT, SMALLINT, MEDIUMINT, BIT, BIGINT, FLOAT, DOUBLE, DECIMAL, BOOLEAN, ID, DATE, TIME, DATETIME, TIMESTAMP".split(', ')
@@ -99,9 +100,10 @@ def fetchQueryData(cursor, sql):
 
 def tryFetchData(args):
     dat = {}
+    #conf = {host: args['dbhost'], port: args['dbport'], user: args['dbuser'], passwd: args['dbpassword'], db: args['dbname'], charset: 'utf8mb4', auth_plugin: 'mysql_native_password'}
     try:
         print(f"connstr={args['dbhost']}:{args['dbport']}|{args['dbuser']}|{args['dbpassword']}|{args['dbname']}")
-        conn = mysql.connector.connect(host=args['dbhost'], port=args['dbport'], user=args['dbuser'], passwd=args['dbpassword'], db=args['dbname'], charset='utf8mb4')
+        conn = mysql.connector.connect(host=args['dbhost'], port=args['dbport'], user=args['dbuser'], passwd=args['dbpassword'], db=args['dbname'], charset='utf8mb4', auth_plugin='mysql_native_password')
         cur = conn.cursor(buffered=True)
         dat = fetchTableSchemaData(cur, args['dbname'], args['tableName']) if args['SQL'] =='' else fetchQueryData(cur, args['SQL'])
         dat['consts'] = readConsts(args['consts'])
