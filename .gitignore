@@ -1,9 +1,11 @@
 .vs/
 .vscode/
+.idea/
 /output/*
 /build/
 /dist/
 __pycache__/
+*.iml
 *.spec
 ~*/
 *.~*
