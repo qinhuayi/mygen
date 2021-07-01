@@ -1,6 +1,6 @@
 # 项目说明 Project Description
 	**Mygen**是一个Python编写的支持mysql连接和art-template模板的命令行方式的代码生成器。
-	**Mygen** is a code generator under command line writen by Python which support Mysql connection and Art-Template.
+	**Mygen** is a code generator under command line written by Python which support Mysql connection and Art-Template.
 
 ## 程序设计 Program Design
 	1. 首先读取命令行参数，获取Mysql连接字符串、模板文件路径、输出文件路径和模板用到的常量；At first read command line arguments and get Mysql connection string and template file path and output path and consts within template;
@@ -8,7 +8,7 @@
 	3. 之后读取art-template-stanalone.js文件并且用js2py解析出exports对象内唯一的compile方法；And then read the js file 'art-template-stanalone.js' and extract one unique method 'compile' inside object 'exports' with the module 'js2py';
 	4. 最后运行compile(tmpl, data)得到最终代码并保存代码到输出路径。At last run the method 'compile(tmpl, data)' and get the final codes and save to output path.
 
-	需要用到2个模块：一个是Mysql官方的Mysql.connector，另一个是js2py, 可以如下方式安装： Require 2 extra modules: one is 'mysql.connector' from Mysql offical, the other is 'js2py', the installations like this:
+	需要用到2个模块：一个是Mysql官方的Mysql.connector，另一个是js2py, 可以如下方式安装： Require 2 extra modules: one is 'mysql.connector' from Mysql official website, the other is 'js2py', the installations like this:
 	```
 	pip install mysql-connector
 	pip install js2py
@@ -46,7 +46,7 @@
 		consts: {}
 	}
 	```
-	其中table为表属性; columns是一个数组，包含各个字段的定义; rows为（在*查询模式*下）查询得到的数据集; consts来自命令行最后一个参数解析得出的常量。The 'table' includes the table propertys; The 'columns' is an array includes definitions of each column; The 'rows' (under *Query Mode*) is a dataset from data query; The 'consts' includes several consts came from the last command line argument.
+	其中table为表属性; columns是一个数组，包含各个字段的定义; rows为（在*查询模式*下）查询得到的数据集; consts来自命令行最后一个参数解析得出的常量。The 'table' includes the table properties; The 'columns' is an array includes definitions of each column; The 'rows' (under *Query Mode*) is a dataset from data query; The 'consts' includes several consts came from the last command line argument.
 	更具体的含义略。More details are omitted.
 
 ## 用法 Usage
@@ -57,4 +57,4 @@
 	`python mygen.py "127.0.0.1:3306|qinhy|123456|db_entbase|tb_workflow" "templates/entity.kt" "output/workflow.kt" "author=qinhuayi|email=qinhuayi@qq.com"`
 	另一个例子（查询模式）：Another Example(Query Mode):
 	`python mygen.py "127.0.0.1:3306|qinhy|123456|db_entbase|select * from tb_workflow" "templates/entity.kt" "output/workflow.kt" "author=qinhuayi|email=qinhuayi@qq.com"`
-	推荐编写shell脚本来运行。Recommand run by shell scripts.
+	推荐编写shell脚本来运行。Recommend run by shell scripts. 
