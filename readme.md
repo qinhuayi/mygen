@@ -57,4 +57,4 @@
 	`python mygen.py "127.0.0.1:3306|qinhy|123456|db_entbase|tb_workflow" "templates/entity.kt" "output/workflow.kt" "author=qinhuayi|email=qinhuayi@qq.com"`
 	另一个例子（查询模式）：Another Example(Query Mode):
 	`python mygen.py "127.0.0.1:3306|qinhy|123456|db_entbase|select * from tb_workflow" "templates/entity.kt" "output/workflow.kt" "author=qinhuayi|email=qinhuayi@qq.com"`
-	推荐编写shell脚本来运行。Recommend run by shell scripts. 
+	推荐编写shell脚本来运行。Recommend run by shell scripts.  
